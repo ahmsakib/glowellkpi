@@ -554,8 +554,7 @@
         }
 
         // Hardcoded gallery images with more variety
-        const galleryImages = [
-            'Screenshot 2026-02-12 013129.png?w=400&h=300&fit=crop',
+        const galleryImages = ['Screenshot 2026-02-12 013129.png?w=400&h=300&fit=crop',
             'Screenshot 2026-02-19 013930.png?w=400&h=500&fit=crop',
             'image_2026-03-01_214248609.png?w=400&h=400&fit=crop',
             'image_2026-03-01_214305122.png?w=400&h=300&fit=crop',
@@ -627,7 +626,7 @@
             var container = document.getElementById('kpiDashboard');
             var roleUpper = role === 'overall' ? 'OVERALL TEAM' : role.toUpperCase();
             var roleIndexes = getIndexesForRole(role);
-            
+
             var html = `
                 <div class="dashboard-panel">
                     <div class="exec-header">
@@ -646,11 +645,11 @@
                         <div class="chart-box"><h3><i class="fa-regular fa-bullseye"></i> this month vs target</h3><div class="chart-container"><canvas id="targetChart"></canvas></div></div>
                     </div>
             `;
-            
+
             if (role !== 'overall') {
                 html += `<div style="background:linear-gradient(145deg, #f9fcf6, #edf5e5); border-radius:2rem; padding:1.5rem; margin:1.5rem 0;"><h3 style="color:#3f6247;"><i class="fa-regular fa-star"></i> your KPIs</h3><table><thead><tr><th>KPI</th><th>last month</th><th>target</th><th>this month</th><th>observations</th><th>actions</th></tr></thead><tbody id="roleTbody"></tbody></table></div>`;
             }
-            
+
             html += `<h3 style="margin: 2rem 0 1rem; color:#1d4a3a;"><i class="fa-regular fa-table"></i> all metrics · monthly comparison</h3>
                     <table><thead><tr><th>KPI</th><th>last month</th><th>target</th><th>this month</th><th>observations</th><th>actions</th></tr></thead><tbody id="fullTbody"></tbody></table>
                     <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center;">
@@ -658,7 +657,7 @@
                         <span style="color:#8FA05D;"><i class="fa-regular fa-clock"></i> real-time updates</span>
                     </div>
                 </div>`;
-            
+
             container.innerHTML = html;
             container.style.display = 'block';
             document.getElementById('rolePage').style.display = 'none';
@@ -707,7 +706,7 @@
                         updateCharts();
                     });
                 }
-                
+
                 // TP2 inputs
                 var tp2Inputs = document.querySelectorAll('.tp2-role, .tp2-full');
                 for (var b = 0; b < tp2Inputs.length; b++) {
@@ -719,7 +718,7 @@
                         updateCharts();
                     });
                 }
-                
+
                 // Observation inputs
                 var obsInputs = document.querySelectorAll('.obs-role, .obs-full');
                 for (var c = 0; c < obsInputs.length; c++) {
@@ -728,7 +727,7 @@
                         persistState();
                     });
                 }
-                
+
                 // Action inputs
                 var actInputs = document.querySelectorAll('.act-role, .act-full');
                 for (var d = 0; d < actInputs.length; d++) {
@@ -757,31 +756,31 @@
                 var pieCanvas = document.getElementById('pieChart');
                 var barCanvas = document.getElementById('barChart');
                 var targetCanvas = document.getElementById('targetChart');
-                
+
                 if (!pieCanvas || !barCanvas || !targetCanvas) return;
-                
+
                 var ctxPie = pieCanvas.getContext('2d');
                 var ctxBar = barCanvas.getContext('2d');
                 var ctxTar = targetCanvas.getContext('2d');
-                
+
                 // Ensure we have positive values for pie chart
                 var total = 0;
                 for (var t = 0; t < tp2Values.length; t++) {
                     total += Math.abs(tp2Values[t]) || 0.01; // Use absolute values and ensure minimum
                 }
-                
+
                 // Prepare pie data - use absolute values and ensure no zeros
                 var pieData = [];
                 for (var p = 0; p < tp2Values.length; p++) {
                     var val = Math.abs(tp2Values[p]) || 0.01;
                     pieData.push((val / total) * 100);
                 }
-                
+
                 // Destroy existing charts if they exist
                 if (pie) pie.destroy();
                 if (bar) bar.destroy();
                 if (target) target.destroy();
-                
+
                 // Create new pie chart with guaranteed data
                 pie = new Chart(ctxPie, {
                     type: 'pie',
@@ -815,7 +814,7 @@
                         }
                     }
                 });
-                
+
                 // Bar chart data
                 var barLabels, barTp1, barTp2;
                 if (role === 'overall') {
@@ -833,7 +832,7 @@
                         barTp2.push(tp2Values[idx]);
                     }
                 }
-                
+
                 bar = new Chart(ctxBar, {
                     type: 'bar',
                     data: {
@@ -872,7 +871,7 @@
                         }
                     }
                 });
-                
+
                 // Target chart data
                 var targetData;
                 if (role === 'overall') {
@@ -883,7 +882,7 @@
                         targetData.push(kpiMaster[roleIndexes[t2]].target);
                     }
                 }
-                
+
                 target = new Chart(ctxTar, {
                     type: 'bar',
                     data: {
@@ -926,7 +925,7 @@
                         }
                     }
                 });
-                
+
                 // Update stats
                 var sum1 = 0, sum2 = 0;
                 for (var s1 = 0; s1 < 10; s1++) { 
@@ -936,7 +935,7 @@
                 var avg1 = (sum1 / 10).toFixed(1);
                 var avg2 = (sum2 / 10).toFixed(1);
                 var mom = sum1 === 0 ? '0.0' : (((avg2 - avg1) / Math.abs(avg1)) * 100).toFixed(1);
-                
+
                 document.getElementById('avgTp1').innerText = avg1;
                 document.getElementById('avgTp2').innerText = avg2;
                 document.getElementById('momChange').innerText = mom;
@@ -982,7 +981,7 @@
 
             var grid = document.getElementById('pinterestGrid');
             grid.innerHTML = '';
-            
+
             for (var g = 0; g < galleryImages.length; g++) {
                 var item = document.createElement('div');
                 item.className = 'pinterest-item';
