@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glowell · executive command center</title>
+    <!-- Font Awesome 6 & Chart.js & XLSX library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667a4d 0%, #8FA05D 100%);
+            min-height: 100vh;
+            color: #1e3b3a;
+            padding: 1rem;
+        }
+        .app-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 3rem;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* LOGIN PAGE */
+        .login-page {
+            background: linear-gradient(145deg, #ffffff, #f8faf5);
+            border-radius: 3rem;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e0e8d6;
+            max-width: 480px;
+            margin: 2rem auto;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(143,160,93,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .logo-large {
+            background: linear-gradient(145deg, #8FA05D, #6a7a45);
+            width: 120px;
+            height: 120px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.8rem;
+            color: white;
+            font-size: 4rem;
+            box-shadow: 0 20px 30px -8px rgba(143, 160, 93, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+        .login-page h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #1d4a3a, #2b5a42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+        }
+        .login-input-group {
+            background: rgba(244, 249, 239, 0.8);
+            backdrop-filter: blur(5px);
+            border-radius: 60px;
+            border: 2px solid #8FA05D;
+            display: flex;
+            align-items: center;
+            padding: 0.2rem 0.2rem 0.2rem 1.8rem;
+            margin-bottom: 1.8rem;
+            position: relative;
+            z-index: 1;
+        }
+        .login-input-group i {
+            color: #8FA05D;
+            font-size: 1.3rem;
+        }
+        .login-input-group input {
+            border: none;
+            background: transparent;
+            padding: 1rem 0.8rem;
+            font-size: 1rem;
+            flex: 1;
+            outline: none;
+            color: #2b4f3a;
+            font-weight: 500;
+        }
+        .login-btn {
+            background: linear-gradient(145deg, #8FA05D, #6a7a45);
+            border: none;
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 20px -5px rgba(143, 160, 93, 0.4);
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(143, 160, 93, 0.6);
+        }
+        .error-msg {
+            color: #c14f4f;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ROLE SELECTION PAGE */
+        .role-page {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 3rem;
+            padding: 2.5rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #1d4a3a, #2b5a42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-icon {
+            background: linear-gradient(145deg, #8FA05D, #6a7a45);
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.2rem;
+            box-shadow: 0 10px 15px -5px rgba(143, 160, 93, 0.4);
+        }
+        .back-home {
+            background: transparent;
+            border: 2px solid #8FA05D;
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            color: #2b5a42;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .back-home:hover {
+            background: #8FA05D;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .role-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 3rem 0;
+        }
+        .role-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border: 2px solid #e0e8d6;
+            border-radius: 3rem;
+            padding: 2rem 1.5rem;
+            width: 170px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 10px 20px -10px rgba(0,0,0,0.1);
+        }
+        .role-card:hover {
+            border-color: #8FA05D;
+            background: white;
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 30px 30px -15px rgba(143,160,93,0.4);
+        }
+        .role-card i {
+            font-size: 3rem;
+            color: #8FA05D;
+            margin-bottom: 1rem;
+        }
+        .role-card h3 {
+            font-weight: 600;
+            color: #2b4b3a;
+        }
+        .gallery-preview {
+            background: linear-gradient(145deg, #f0f7ea, #e0ebd5);
+            border-radius: 4rem;
+            padding: 1.2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border: 2px dashed #8FA05D;
+            margin-top: 2rem;
+        }
+        .gallery-link {
+            background: white;
+            padding: 0.7rem 2.2rem;
+            border-radius: 40px;
+            color: #1d4a3a;
+            font-weight: 600;
+            border: 2px solid #8FA05D;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .gallery-link:hover {
+            background: #8FA05D;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* DASHBOARD PANEL */
+        .dashboard-panel, .gallery-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 3rem;
+            padding: 2rem 2rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .exec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .selected-role-badge {
+            background: linear-gradient(145deg, #8FA05D, #6a7a45);
+            color: white;
+            padding: 0.6rem 2.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 15px -5px rgba(143, 160, 93, 0.4);
+        }
+        .stats-card {
+            background: linear-gradient(145deg, #f7faf3, #e8f0df);
+            border-radius: 2.2rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border: 2px dashed #8FA05D;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .stats-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            opacity: 0.3;
+            animation: shine 10s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        .stat-item {
+            background: white;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            border: 2px solid #8FA05D;
+            font-weight: 600;
+            color: #2b5440;
+            box-shadow: 0 5px 10px -2px rgba(0,0,0,0.1);
+        }
+        .stat-item span {
+            color: #8FA05D;
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-left: 0.7rem;
+        }
+        .export-btn {
+            background: linear-gradient(145deg, #8FA05D, #6a7a45);
+            color: white;
+            border: none;
+            padding: 0.7rem 2.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin-left: auto;
+            transition: all 0.3s;
+            box-shadow: 0 10px 15px -5px rgba(143, 160, 93, 0.4);
+        }
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 20px -5px rgba(143, 160, 93, 0.6);
+        }
+        .chart-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .chart-box {
+            flex: 1 1 300px;
+            background: linear-gradient(145deg, #ffffff, #f8faf5);
+            padding: 1.5rem 1.2rem;
+            border-radius: 2.2rem;
+            border: 2px solid #e0e8d6;
+            box-shadow: 0 15px 25px -10px rgba(0,0,0,0.1);
+        }
+        .chart-box h3 {
+            color: #2b5440;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .chart-container {
+            height: 220px;
+            position: relative;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 15px 30px -10px rgba(143,160,93,0.2);
+            margin: 1.5rem 0;
+            border: 2px solid #e0e8d6;
+        }
+        th {
+            background: linear-gradient(145deg, #e3ebd9, #d3dec7);
+            color: #1d4a3a;
+            font-weight: 700;
+            padding: 1rem 0.6rem;
+            font-size: 0.9rem;
+        }
+        td {
+            padding: 0.9rem 0.6rem;
+            border-bottom: 1px solid #e0e8d6;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        input[type="number"] {
+            width: 85px;
+            padding: 0.5rem;
+            border-radius: 20px;
+            border: 2px solid #d0ddc6;
+            text-align: center;
+            background: white;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        input[type="number"]:focus {
+            border-color: #8FA05D;
+            box-shadow: 0 0 0 3px rgba(143,160,93,0.2);
+            outline: none;
+        }
+        input[type="text"] {
+            border: 2px solid #d0ddc6;
+            border-radius: 20px;
+            padding: 0.5rem 0.8rem;
+            width: 130px;
+            background: white;
+            transition: all 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #8FA05D;
+            box-shadow: 0 0 0 3px rgba(143,160,93,0.2);
+            outline: none;
+        }
+        .save-indicator {
+            background: linear-gradient(145deg, #e7f0da, #d7e3c7);
+            padding: 0.5rem 1.8rem;
+            border-radius: 40px;
+            display: inline-block;
+            color: #2c5a3c;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 2px solid #8FA05D;
+        }
+
+        /* PINTEREST GALLERY */
+        .pinterest-grid {
+            column-count: 4;
+            column-gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .pinterest-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            background: white;
+            border-radius: 2rem;
+            padding: 1rem;
+            border: 2px solid #e0e8d6;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+        }
+        .pinterest-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #8FA05D;
+            box-shadow: 0 30px 30px -10px rgba(143,160,93,0.4);
+        }
+        .pinterest-item img {
+            width: 100%;
+            border-radius: 1.5rem;
+            object-fit: cover;
+            display: block;
+        }
+        @media (max-width: 800px) {
+            .pinterest-grid { column-count: 2; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrapper" id="appWrapper">
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="login-page">
+        <div class="logo-large"><i class="fas fa-chart-pie"></i></div>
+        <h2>Glowell</h2>
+        <div class="login-input-group">
+            <i class="fa-regular fa-lock"></i>
+            <input type="password" id="passwordInput" placeholder="enter passcode">
+        </div>
+        <button id="loginBtn" class="login-btn"><i class="fa-regular fa-unlock-keyhole"></i> access command center</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+
+    <!-- ROLE SELECTION PAGE -->
+    <div id="rolePage" style="display: none;" class="role-page">
+        <div class="role-header">
+            <div class="logo-placeholder">
+                <div class="logo-icon"><i class="fas fa-chart-pie"></i></div>
+                <span>Glowell <span style="color:#8FA05D;">executive</span></span>
+            </div>
+            <button class="back-home" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> sign out</button>
+        </div>
+        <h2 style="text-align: center; color:#1d4a3a; margin: 1rem 0;">select your command role</h2>
+        <div class="role-grid" id="roleGrid">
+            <div class="role-card" data-role="ceo"><i class="fas fa-crown"></i><h3>CEO</h3></div>
+            <div class="role-card" data-role="cfo"><i class="fas fa-chart-line"></i><h3>CFO</h3></div>
+            <div class="role-card" data-role="cmo"><i class="fas fa-bullhorn"></i><h3>CMO</h3></div>
+            <div class="role-card" data-role="cto"><i class="fas fa-microchip"></i><h3>CTO</h3></div>
+            <div class="role-card" data-role="chro"><i class="fas fa-handshake"></i><h3>CHRO</h3></div>
+            <div class="role-card" data-role="coo"><i class="fas fa-gears"></i><h3>COO</h3></div>
+            <div class="role-card" data-role="cso"><i class="fas fa-chess-board"></i><h3>CSO</h3></div>
+            <div class="role-card" data-role="overall"><i class="fas fa-users-between-lines"></i><h3>Overall</h3></div>
+        </div>
+        <div class="gallery-preview">
+            <span><i class="fa-regular fa-images" style="color:#8FA05D;"></i> Glowell gallery</span>
+            <button id="gotoGalleryBtn" class="gallery-link"><i class="fa-regular fa-folder-open"></i> view gallery</button>
+        </div>
+    </div>
+
+    <!-- KPI DASHBOARD (dynamic) -->
+    <div id="kpiDashboard" style="display: none;"></div>
+
+    <!-- GALLERY PAGE (hardcoded images) -->
+    <div id="galleryPage" style="display: none;"></div>
+</div>
+
+<script>
+    (function() {
+        // ---------- GLOBAL ----------
+        const CORRECT_PASSWORD = "Glowell@1234";
+
+        // KPI definitions
+        const kpiMaster = [
+            { name:'Order Fulfillment', desc:'Avg days order to handoff', target:3.5, owner:['cmo','coo'] },
+            { name:'Inventory Turnover', desc:'COGS / avg inventory', target:6.2, owner:['coo','cfo'] },
+            { name:'CSAT', desc:'Customer rating (0-10)', target:9.0, owner:['cmo','cso'] },
+            { name:'NPS', desc:'% promoters minus detractors', target:55, owner:['cmo','cso'] },
+            { name:'Team Engagement', desc:'Weekly engagement (1-5)', target:4.5, owner:['chro','coo'] },
+            { name:'Attendance Rate', desc:'% meetings attended', target:92, owner:['chro'] },
+            { name:'Exec Initiative', desc:'% on schedule', target:85, owner:['ceo','cso'] },
+            { name:'Decision Stability', desc:'% not reversed', target:90, owner:['ceo','cso'] },
+            { name:'Gross Margin', desc:'(Revenue-COGS)/Revenue', target:52.0, owner:['cfo','ceo'] },
+            { name:'Revenue Growth', desc:'% vs prior month', target:8.0, owner:['cfo','cmo'] }
+        ];
+
+        // Load / initialize storage
+        const STORAGE_KEY = 'glowell_kpi';
+        function loadState() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const data = JSON.parse(stored);
+                    return {
+                        tp1: data.tp1 || new Array(10).fill(0),
+                        tp2: data.tp2 || new Array(10).fill(0),
+                        obs: data.obs || kpiMaster.map(() => ''),
+                        acts: data.acts || kpiMaster.map(() => '')
+                    };
+                } catch (e) {}
+            }
+            return { tp1: new Array(10).fill(0), tp2: new Array(10).fill(0), obs: kpiMaster.map(()=>''), acts: kpiMaster.map(()=>'') };
+        }
+        let state = loadState();
+        let tp1Values = state.tp1;
+        let tp2Values = state.tp2;
+        let observations = state.obs;
+        let actions = state.acts;
+
+        function persistState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ tp1: tp1Values, tp2: tp2Values, obs: observations, acts: actions }));
+        }
+
+        // Hardcoded gallery images with more variety
+        const galleryImages = [
+            'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=400&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=500&fit=crop',
+            'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1552581234-26160f608093?w=400&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=500&fit=crop',
+            'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1515187029135-18ee060d47f2?w=400&h=300&fit=crop',
+            'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=500&fit=crop',
+            'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=400&fit=crop'
+        ];
+
+        // ---------- LOGIN ----------
+        document.getElementById('loginBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            var pwd = document.getElementById('passwordInput').value;
+            if (pwd === CORRECT_PASSWORD) {
+                document.getElementById('loginError').innerText = '';
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('rolePage').style.display = 'block';
+            } else {
+                document.getElementById('loginError').innerText = 'Invalid passcode';
+            }
+        });
+
+        // Allow Enter key in password field
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginBtn').click();
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('rolePage').style.display = 'none';
+            document.getElementById('kpiDashboard').style.display = 'none';
+            document.getElementById('galleryPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('passwordInput').value = '';
+        });
+
+        // ---------- ROLE CLICK ----------
+        document.querySelectorAll('.role-card').forEach(function(card) {
+            card.addEventListener('click', function(e) {
+                var role = this.dataset.role;
+                renderKpiDashboard(role);
+            });
+        });
+
+        // ---------- GALLERY ----------
+        document.getElementById('gotoGalleryBtn').addEventListener('click', function() {
+            renderGallery();
+        });
+
+        function getIndexesForRole(role) {
+            if (role === 'overall') return [...Array(10).keys()];
+            var indexes = [];
+            for (var i = 0; i < kpiMaster.length; i++) {
+                if (kpiMaster[i].owner.includes(role)) {
+                    indexes.push(i);
+                }
+            }
+            return indexes;
+        }
+
+        // ---------- RENDER KPI DASHBOARD ----------
+        function renderKpiDashboard(role) {
+            var container = document.getElementById('kpiDashboard');
+            var roleUpper = role === 'overall' ? 'OVERALL TEAM' : role.toUpperCase();
+            var roleIndexes = getIndexesForRole(role);
+            
+            var html = `
+                <div class="dashboard-panel">
+                    <div class="exec-header">
+                        <div><span class="selected-role-badge"><i class="fas fa-id-card"></i> ${roleUpper} · monthly KPI</span></div>
+                        <div><button class="back-home" id="backToRole"><i class="fas fa-arrow-left"></i> all roles</button></div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stat-item">last month avg <span id="avgTp1">0.0</span></div>
+                        <div class="stat-item">this month avg <span id="avgTp2">0.0</span></div>
+                        <div class="stat-item">change <span id="momChange">0.0</span>%</div>
+                        <button class="export-btn" id="exportSpreadsheet"><i class="fa-regular fa-file-excel"></i> export to excel</button>
+                    </div>
+                    <div class="chart-grid">
+                        <div class="chart-box"><h3><i class="fa-regular fa-chart-pie"></i> this month distribution</h3><div class="chart-container"><canvas id="pieChart"></canvas></div></div>
+                        <div class="chart-box"><h3><i class="fa-regular fa-chart-bar"></i> ${roleUpper}: last vs this month</h3><div class="chart-container"><canvas id="barChart"></canvas></div></div>
+                        <div class="chart-box"><h3><i class="fa-regular fa-bullseye"></i> this month vs target</h3><div class="chart-container"><canvas id="targetChart"></canvas></div></div>
+                    </div>
+            `;
+            
+            if (role !== 'overall') {
+                html += `<div style="background:linear-gradient(145deg, #f9fcf6, #edf5e5); border-radius:2rem; padding:1.5rem; margin:1.5rem 0;"><h3 style="color:#3f6247;"><i class="fa-regular fa-star"></i> your KPIs</h3><table><thead><tr><th>KPI</th><th>last month</th><th>target</th><th>this month</th><th>observations</th><th>actions</th></tr></thead><tbody id="roleTbody"></tbody></table></div>`;
+            }
+            
+            html += `<h3 style="margin: 2rem 0 1rem; color:#1d4a3a;"><i class="fa-regular fa-table"></i> all metrics · monthly comparison</h3>
+                    <table><thead><tr><th>KPI</th><th>last month</th><th>target</th><th>this month</th><th>observations</th><th>actions</th></tr></thead><tbody id="fullTbody"></tbody></table>
+                    <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span class="save-indicator"><i class="fa-regular fa-floppy-disk"></i> auto-saved in cloud</span>
+                        <span style="color:#8FA05D;"><i class="fa-regular fa-clock"></i> real-time updates</span>
+                    </div>
+                </div>`;
+            
+            container.innerHTML = html;
+            container.style.display = 'block';
+            document.getElementById('rolePage').style.display = 'none';
+            document.getElementById('galleryPage').style.display = 'none';
+
+            // Role-specific table
+            if (role !== 'overall') {
+                var tbody = document.getElementById('roleTbody');
+                for (var j = 0; j < roleIndexes.length; j++) {
+                    var idx = roleIndexes[j];
+                    var k = kpiMaster[idx];
+                    var row = document.createElement('tr');
+                    row.innerHTML = '<td><strong>' + k.name + '</strong></td>' +
+                        '<td><input type="number" step="0.1" class="tp1-role" data-index="' + idx + '" value="' + tp1Values[idx] + '"></td>' +
+                        '<td>' + k.target + '</td>' +
+                        '<td><input type="number" step="0.1" class="tp2-role" data-index="' + idx + '" value="' + tp2Values[idx] + '"></td>' +
+                        '<td><input type="text" class="obs-role" data-index="' + idx + '" value="' + observations[idx] + '" placeholder="—"></td>' +
+                        '<td><input type="text" class="act-role" data-index="' + idx + '" value="' + actions[idx] + '" placeholder="—"></td>';
+                    tbody.appendChild(row);
+                }
+            }
+
+            // Full table
+            var fullTbody = document.getElementById('fullTbody');
+            for (var i = 0; i < 10; i++) {
+                var k = kpiMaster[i];
+                var row = document.createElement('tr');
+                row.innerHTML = '<td>' + k.name + '</td>' +
+                    '<td><input type="number" step="0.1" class="tp1-full" data-index="' + i + '" value="' + tp1Values[i] + '"></td>' +
+                    '<td>' + k.target + '</td>' +
+                    '<td><input type="number" step="0.1" class="tp2-full" data-index="' + i + '" value="' + tp2Values[i] + '"></td>' +
+                    '<td><input type="text" class="obs-full" data-index="' + i + '" value="' + observations[i] + '" placeholder="—"></td>' +
+                    '<td><input type="text" class="act-full" data-index="' + i + '" value="' + actions[i] + '" placeholder="—"></td>';
+                fullTbody.appendChild(row);
+            }
+
+            function attachListeners() {
+                // TP1 inputs
+                var tp1Inputs = document.querySelectorAll('.tp1-role, .tp1-full');
+                for (var a = 0; a < tp1Inputs.length; a++) {
+                    tp1Inputs[a].addEventListener('input', function(e) {
+                        var idx = this.dataset.index;
+                        tp1Values[idx] = parseFloat(this.value) || 0;
+                        syncAllInputs();
+                        persistState();
+                        updateCharts();
+                    });
+                }
+                
+                // TP2 inputs
+                var tp2Inputs = document.querySelectorAll('.tp2-role, .tp2-full');
+                for (var b = 0; b < tp2Inputs.length; b++) {
+                    tp2Inputs[b].addEventListener('input', function(e) {
+                        var idx = this.dataset.index;
+                        tp2Values[idx] = parseFloat(this.value) || 0;
+                        syncAllInputs();
+                        persistState();
+                        updateCharts();
+                    });
+                }
+                
+                // Observation inputs
+                var obsInputs = document.querySelectorAll('.obs-role, .obs-full');
+                for (var c = 0; c < obsInputs.length; c++) {
+                    obsInputs[c].addEventListener('input', function(e) {
+                        observations[this.dataset.index] = this.value;
+                        persistState();
+                    });
+                }
+                
+                // Action inputs
+                var actInputs = document.querySelectorAll('.act-role, .act-full');
+                for (var d = 0; d < actInputs.length; d++) {
+                    actInputs[d].addEventListener('input', function(e) {
+                        actions[this.dataset.index] = this.value;
+                        persistState();
+                    });
+                }
+            }
+
+            function syncAllInputs() {
+                var tp1All = document.querySelectorAll('.tp1-role, .tp1-full');
+                for (var s = 0; s < tp1All.length; s++) {
+                    tp1All[s].value = tp1Values[tp1All[s].dataset.index];
+                }
+                var tp2All = document.querySelectorAll('.tp2-role, .tp2-full');
+                for (var t = 0; t < tp2All.length; t++) {
+                    tp2All[t].value = tp2Values[tp2All[t].dataset.index];
+                }
+            }
+
+            var pie, bar, target;
+
+            function updateCharts() {
+                // Get canvas elements
+                var pieCanvas = document.getElementById('pieChart');
+                var barCanvas = document.getElementById('barChart');
+                var targetCanvas = document.getElementById('targetChart');
+                
+                if (!pieCanvas || !barCanvas || !targetCanvas) return;
+                
+                var ctxPie = pieCanvas.getContext('2d');
+                var ctxBar = barCanvas.getContext('2d');
+                var ctxTar = targetCanvas.getContext('2d');
+                
+                // Ensure we have positive values for pie chart
+                var total = 0;
+                for (var t = 0; t < tp2Values.length; t++) {
+                    total += Math.abs(tp2Values[t]) || 0.01; // Use absolute values and ensure minimum
+                }
+                
+                // Prepare pie data - use absolute values and ensure no zeros
+                var pieData = [];
+                for (var p = 0; p < tp2Values.length; p++) {
+                    var val = Math.abs(tp2Values[p]) || 0.01;
+                    pieData.push((val / total) * 100);
+                }
+                
+                // Destroy existing charts if they exist
+                if (pie) pie.destroy();
+                if (bar) bar.destroy();
+                if (target) target.destroy();
+                
+                // Create new pie chart with guaranteed data
+                pie = new Chart(ctxPie, {
+                    type: 'pie',
+                    data: {
+                        labels: kpiMaster.map(function(k) { return k.name.substring(0, 8); }),
+                        datasets: [{
+                            data: pieData,
+                            backgroundColor: [
+                                '#8FA05D', '#A5B87B', '#B9CB94', '#C9D9AB', '#DAE5C2',
+                                '#B0C4A2', '#9FB894', '#8EAE7D', '#7FA26B', '#709459'
+                            ],
+                            borderWidth: 2,
+                            borderColor: 'white'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#2b5440', font: { size: 10 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.raw.toFixed(1) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Bar chart data
+                var barLabels, barTp1, barTp2;
+                if (role === 'overall') {
+                    barLabels = kpiMaster.map(function(k) { return k.name.substring(0, 10); });
+                    barTp1 = tp1Values.slice();
+                    barTp2 = tp2Values.slice();
+                } else {
+                    barLabels = [];
+                    barTp1 = [];
+                    barTp2 = [];
+                    for (var r = 0; r < roleIndexes.length; r++) {
+                        var idx = roleIndexes[r];
+                        barLabels.push(kpiMaster[idx].name.substring(0, 10));
+                        barTp1.push(tp1Values[idx]);
+                        barTp2.push(tp2Values[idx]);
+                    }
+                }
+                
+                bar = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: barLabels,
+                        datasets: [
+                            { 
+                                label: 'last month', 
+                                data: barTp1, 
+                                backgroundColor: '#B0C4A2',
+                                borderRadius: 6,
+                                barPercentage: 0.7
+                            },
+                            { 
+                                label: 'this month', 
+                                data: barTp2, 
+                                backgroundColor: '#8FA05D',
+                                borderRadius: 6,
+                                barPercentage: 0.7
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                position: 'top',
+                                labels: { color: '#2b5440' }
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: '#e0e8d6' }
+                            }
+                        }
+                    }
+                });
+                
+                // Target chart data
+                var targetData;
+                if (role === 'overall') {
+                    targetData = kpiMaster.map(function(k) { return k.target; });
+                } else {
+                    targetData = [];
+                    for (var t2 = 0; t2 < roleIndexes.length; t2++) {
+                        targetData.push(kpiMaster[roleIndexes[t2]].target);
+                    }
+                }
+                
+                target = new Chart(ctxTar, {
+                    type: 'bar',
+                    data: {
+                        labels: barLabels,
+                        datasets: [
+                            { 
+                                label: 'this month', 
+                                data: barTp2, 
+                                backgroundColor: '#8FA05D',
+                                borderRadius: 6,
+                                barPercentage: 0.7
+                            },
+                            { 
+                                label: 'target', 
+                                data: targetData, 
+                                type: 'line', 
+                                borderColor: '#CC7F4A', 
+                                borderWidth: 3, 
+                                pointRadius: 5,
+                                pointBackgroundColor: '#CC7F4A',
+                                fill: false,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                position: 'top',
+                                labels: { color: '#2b5440' }
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: '#e0e8d6' }
+                            }
+                        }
+                    }
+                });
+                
+                // Update stats
+                var sum1 = 0, sum2 = 0;
+                for (var s1 = 0; s1 < 10; s1++) { 
+                    sum1 += tp1Values[s1]; 
+                    sum2 += tp2Values[s1]; 
+                }
+                var avg1 = (sum1 / 10).toFixed(1);
+                var avg2 = (sum2 / 10).toFixed(1);
+                var mom = sum1 === 0 ? '0.0' : (((avg2 - avg1) / Math.abs(avg1)) * 100).toFixed(1);
+                
+                document.getElementById('avgTp1').innerText = avg1;
+                document.getElementById('avgTp2').innerText = avg2;
+                document.getElementById('momChange').innerText = mom;
+            }
+
+            attachListeners();
+            // Small delay to ensure DOM is ready
+            setTimeout(updateCharts, 100);
+
+            document.getElementById('backToRole').addEventListener('click', function() {
+                container.style.display = 'none';
+                document.getElementById('rolePage').style.display = 'block';
+            });
+
+            document.getElementById('exportSpreadsheet').addEventListener('click', function() {
+                var wbData = [['KPI', 'Last Month (TP1)', 'Target', 'This Month (TP2)', 'Observations', 'Actions']];
+                for (var ex = 0; ex < 10; ex++) {
+                    wbData.push([kpiMaster[ex].name, tp1Values[ex], kpiMaster[ex].target, tp2Values[ex], observations[ex], actions[ex]]);
+                }
+                var ws = XLSX.utils.aoa_to_sheet(wbData);
+                var wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Monthly KPI');
+                XLSX.writeFile(wb, 'Glowell_KPI_' + role + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
+            });
+        }
+
+        // ---------- RENDER GALLERY ----------
+        function renderGallery() {
+            var container = document.getElementById('galleryPage');
+            var html = `
+                <div class="gallery-panel">
+                    <div class="exec-header">
+                        <div><span class="selected-role-badge"><i class="fa-regular fa-images"></i> Glowell gallery</span></div>
+                        <div><button class="back-home" id="galleryBack"><i class="fas fa-arrow-left"></i> back</button></div>
+                    </div>
+                    <div class="pinterest-grid" id="pinterestGrid"></div>
+                </div>
+            `;
+            container.innerHTML = html;
+            container.style.display = 'block';
+            document.getElementById('rolePage').style.display = 'none';
+            document.getElementById('kpiDashboard').style.display = 'none';
+
+            var grid = document.getElementById('pinterestGrid');
+            grid.innerHTML = '';
+            
+            for (var g = 0; g < galleryImages.length; g++) {
+                var item = document.createElement('div');
+                item.className = 'pinterest-item';
+                item.innerHTML = '<img src="' + galleryImages[g] + '" alt="gallery image ' + (g+1) + '" loading="lazy">';
+                grid.appendChild(item);
+            }
+
+            document.getElementById('galleryBack').addEventListener('click', function() {
+                container.style.display = 'none';
+                document.getElementById('rolePage').style.display = 'block';
+            });
+        }
+    })();
+</script>
+</body>
+</html>
